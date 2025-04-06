@@ -2,8 +2,8 @@
 #include <complex.h>
 #include <math.h>
 #include <stdio.h>
-//#include <stdlib.h>
-//#include <time.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define BUFFER_LINE 800
 
@@ -39,8 +39,8 @@ double complex newton(double complex zn) {
 }
 
 void drawGraph() {
-    //struct timespec begin;
-    //clock_gettime(CLOCK_REALTIME, &begin);
+    // struct timespec begin;
+    // clock_gettime(CLOCK_REALTIME, &begin);
     double step_size = screen_range/BUFFER_LINE;
     #pragma omp parallel for
     for (int i = 0; i < BUFFER_LINE; i++) {
@@ -56,9 +56,9 @@ void drawGraph() {
                 };
         }
     }
-    //struct timespec end;
-    //clock_gettime(CLOCK_REALTIME, &end);
-    //printf("%ld ms\n", ((end.tv_sec - begin.tv_sec)*1000) + (end.tv_nsec - begin.tv_nsec) / 1000000);
+    // struct timespec end;
+    // clock_gettime(CLOCK_REALTIME, &end);
+    // printf("%ld ms to calculate the newton methods\n", ((end.tv_sec - begin.tv_sec)*1000) + (end.tv_nsec - begin.tv_nsec) / 1000000);
 
     glDrawPixels(BUFFER_LINE, BUFFER_LINE, GL_RGB, GL_FLOAT, pixels);
 }
@@ -67,7 +67,6 @@ void keyboard(unsigned char key, int, int) {
     switch (key) {
     case ' ':
         screen_range /= 2.0;
-	    printf("%.30f\n", screen_range);
 	    break;
     case 'w':
 	    pos_y += screen_range/16.0;
@@ -83,6 +82,8 @@ void keyboard(unsigned char key, int, int) {
 	    break;
     }
     glutPostRedisplay();
+    // printf("side of the screen rectangle is %.30f\n", screen_range);
+    // putchar('\n');
 }
 
 void draw() {
@@ -106,7 +107,11 @@ void aberth() {
         }
     }
     for (int i = 0; i < 3; i++) {
-        printf("%f + %fi\n", creal(true_roots[i]), cimag(true_roots[i]));
+        if (cimag(true_roots[i]) < 0) {
+            printf("root #%d found: %.25f %.25fi\n", i, creal(true_roots[i]), cimag(true_roots[i]));
+        } else {
+            printf("root #%d found: %.25f + %.25fi\n", i, creal(true_roots[i]), cimag(true_roots[i]));
+        }
     }
 }
 
