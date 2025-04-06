@@ -15,14 +15,14 @@ struct rgb pixels[BUFFER_LINE * BUFFER_LINE];
 
 double coeffs[4];
 double complex true_roots[3] = {
-    -I, 1, I
+    -1+I, 1+I, 1-I
 };
 
 double screen_range = 32.0;
 double pos_x = 0.0;
 double pos_y = 0.0;
 
-double complex slope(double complex z) {
+double complex ratio_z_dz(double complex z) {
     double complex p = 0.0, q = 0.0;
     for (int i = 0; i < 4; i++) {
         q = z * q + p;
@@ -33,7 +33,7 @@ double complex slope(double complex z) {
 
 double complex newton(double complex zn) {
     for (uint16_t i = 0; i < 100; i++) {
-        zn = zn - slope(zn);
+        zn = zn - ratio_z_dz(zn);
     }
     return zn;
 }
@@ -94,15 +94,15 @@ void aberth() {
     double complex w[3];
     for (uint16_t i = 0; i < 1000; i++) {
         for (uint8_t j = 0; j < 3; j++) {
-            const double complex slp = slope(true_roots[j]);
+            const double complex slp = ratio_z_dz(true_roots[j]);
             double complex sum = 0;
             for (uint8_t k = 0; k < 3; k++) {
                 if (j != k) {
-                    sum += 1/(true_roots[k]-true_roots[j]);
+                    sum += 1/(true_roots[j]-true_roots[k]);
                 }
             }
             w[j] = slp / (1-slp*sum);
-            true_roots[j] -= w[j];
+            true_roots[j] = true_roots[j] - w[j];
         }
     }
     for (int i = 0; i < 3; i++) {
@@ -111,10 +111,6 @@ void aberth() {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 5) {
-        puts("this program only supports cubic polynomials because its easier to implement");
-        return -1;
-    }
     coeffs[0] = strtod(argv[1],NULL);
     coeffs[1] = strtod(argv[2],NULL);
     coeffs[2] = strtod(argv[3],NULL);
