@@ -32,7 +32,7 @@ double complex ratio_z_dz(double complex z) {
 }
 
 double complex newton(double complex zn) {
-    for (uint16_t i = 0; i < 100; i++) {
+    for (uint16_t i = 0; i < 128; i++) {
         zn = zn - ratio_z_dz(zn);
     }
     return zn;
@@ -93,7 +93,7 @@ void draw() {
 
 void aberth() {
     double complex w[3];
-    for (uint16_t i = 0; i < 1000; i++) {
+    for (uint16_t i = 0; i < 1024; i++) {
         for (uint8_t j = 0; j < 3; j++) {
             const double complex slp = ratio_z_dz(true_roots[j]);
             double complex sum = 0;
