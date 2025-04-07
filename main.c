@@ -93,7 +93,7 @@ void draw() {
 
 void aberth() {
     double complex w[3];
-    for (uint16_t i = 0; i < 1000; i++) {
+    do {
         for (uint8_t j = 0; j < 3; j++) {
             const double complex slp = ratio_z_dz(true_roots[j]);
             double complex sum = 0;
@@ -105,7 +105,8 @@ void aberth() {
             w[j] = slp / (1-slp*sum);
             true_roots[j] = true_roots[j] - w[j];
         }
-    }
+    } while(w[0] != 0.0 && w[1] != 0.0 && w[2] != 0.0);
+
     for (int i = 0; i < 3; i++) {
         if (cimag(true_roots[i]) < 0) {
             printf("root #%d found: %.25f %.25fi\n", i, creal(true_roots[i]), cimag(true_roots[i]));
