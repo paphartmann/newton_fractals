@@ -121,6 +121,7 @@ int main(int argc, char *argv[]) {
         int its = sscanf(argv[i+1], "%lf+%lfi", &real, &imag);
         if (its == 2) {
             coeffs[i] = CMPLX(real,imag);
+            printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
             continue;
         }
         real = 0.0;
@@ -128,11 +129,13 @@ int main(int argc, char *argv[]) {
         its = sscanf(argv[i+1], "%lf%lfi\n", &real, &imag);
         if (its == 2) {
             coeffs[i] = CMPLX(real,imag);
+            printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
             continue;
         }
         real = 0.0;
         sscanf(argv[i+1], "%lf", &real);
         coeffs[i] = real;
+        printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
     }
 
     aberth();
