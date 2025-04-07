@@ -13,7 +13,7 @@ struct rgb {
 
 struct rgb pixels[BUFFER_LINE * BUFFER_LINE];
 
-double coeffs[4];
+double complex coeffs[4];
 double complex true_roots[3] = {
     -1+I, 1+I, 1-I
 };
@@ -116,10 +116,24 @@ void aberth() {
 }
 
 int main(int argc, char *argv[]) {
-    coeffs[0] = strtod(argv[1],NULL);
-    coeffs[1] = strtod(argv[2],NULL);
-    coeffs[2] = strtod(argv[3],NULL);
-    coeffs[3] = strtod(argv[4],NULL);
+    for (uint8_t i = 0; i < 4; i++) {
+        double real, imag;
+        int its = sscanf(argv[i+1], "%lf+%lfi", &real, &imag);
+        if (its == 2) {
+            coeffs[i] = CMPLX(real,imag);
+            continue;
+        }
+        real = 0.0;
+        imag = 0.0;
+        its = sscanf(argv[i+1], "%lf%lfi\n", &real, &imag);
+        if (its == 2) {
+            coeffs[i] = CMPLX(real,imag);
+            continue;
+        }
+        real = 0.0;
+        sscanf(argv[i+1], "%lf", &real);
+        coeffs[i] = real;
+    }
 
     aberth();
 
