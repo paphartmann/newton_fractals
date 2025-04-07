@@ -109,9 +109,22 @@ void aberth() {
 
     for (int i = 0; i < 3; i++) {
         if (cimag(true_roots[i]) < 0) {
-            printf("root #%d found: %.25f %.25fi\n", i, creal(true_roots[i]), cimag(true_roots[i]));
+            printf("root #%d found: %.25f %.25fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
         } else {
-            printf("root #%d found: %.25f + %.25fi\n", i, creal(true_roots[i]), cimag(true_roots[i]));
+            printf("root #%d found: %.25f + %.25fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
+        }
+        switch (i)
+        {
+        case 0:
+            puts("(red)");
+            break;
+        case 1:
+            puts("(green)");
+            break;
+        case 2:
+            puts("(blue)");
+        default:
+            break;
         }
     }
 }
