@@ -103,11 +103,7 @@ void aberth() {
                 }
             }
             w[j] = slp / (1-slp*sum);
-            double complex prev_true_root = true_roots[j];
             true_roots[j] = true_roots[j] - w[j];
-            if (prev_true_root == true_roots[j]) {
-                break;
-            }
         }
     }
 
