@@ -32,7 +32,7 @@ double complex ratio_z_dz(double complex z) {
 }
 
 double complex newton(double complex zn) {
-    for (uint16_t i = 0; i < 128; i++) {
+    for (uint16_t i = 0; i < 256; i++) {
         zn = zn - ratio_z_dz(zn);
     }
     return zn;
