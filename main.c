@@ -13,25 +13,36 @@ struct rgb {
 
 struct rgb pixels[BUFFER_LINE * BUFFER_LINE];
 
-double complex coeffs[4];
-double complex true_roots[3] = {
-    -1+I, 1+I, 1-I
+uint8_t degree;
+long double complex coeffs[8];
+long double complex true_roots[7] = {
+    -1-I, -1+I, 1+I, 1-I, I, -I, 2+I
 };
 
-double screen_range = 32.0;
-double pos_x = 0.0;
-double pos_y = 0.0;
+const struct rgb colors[7] = {
+    {1, 0, 0},
+    {1, 127.5/255, 0},
+    {1, 1, 0},
+    {0, 1, 0},
+    {0, 0, 1},
+    {75/255.0, 0, 130/255.0},
+    {148/255.0, 0, 211/255.0}
+};
 
-double complex ratio_z_dz(double complex z) {
-    double complex p = 0.0, q = 0.0;
-    for (int i = 0; i < 4; i++) {
+long double screen_range = 32.0;
+long double pos_x = 0.0;
+long double pos_y = 0.0;
+
+long double complex ratio_z_dz(long double complex z) {
+    long double complex p = 0.0, q = 0.0;
+    for (int i = 0; i <= degree; i++) {
         q = z * q + p;
         p = z * p + coeffs[i];
     }
     return p/q;
 }
 
-double complex newton(double complex zn) {
+long double complex newton(long double complex zn) {
     for (uint16_t i = 0; i < 256; i++) {
         zn = zn - ratio_z_dz(zn);
     }
@@ -41,19 +52,22 @@ double complex newton(double complex zn) {
 void drawGraph() {
     // struct timespec begin;
     // clock_gettime(CLOCK_REALTIME, &begin);
-    double step_size = screen_range/BUFFER_LINE;
+    const long double step_size = screen_range/BUFFER_LINE;
     #pragma omp parallel for
     for (int i = 0; i < BUFFER_LINE; i++) {
         for (int j = 0; j < BUFFER_LINE; j++) {
-            double x = (j*step_size) - (screen_range/2) + pos_x;
-            double y = (i*step_size) - (screen_range/2) + pos_y;
-            double complex n_res = newton(CMPLX(x, y));
-            pixels[(BUFFER_LINE*i)+j] =
-                (struct rgb) {
-                    exp2(-8*cabs(n_res - true_roots[0])),
-                    exp2(-8*cabs(n_res - true_roots[1])),
-                    exp2(-8*cabs(n_res - true_roots[2]))
-                };
+            long double x = (j*step_size) - (screen_range/2) + pos_x;
+            long double y = (i*step_size) - (screen_range/2) + pos_y;
+            long double complex n_res = newton(CMPLX(x, y));
+            struct rgb rgb;
+
+            for (uint8_t k = 0; k < degree; k++) {
+                if (cabs(true_roots[k] - n_res) < 0.05) {
+                    rgb = colors[k];
+                }
+            }
+
+            pixels[(BUFFER_LINE*i)+j] = rgb;
         }
     }
     // struct timespec end;
@@ -82,8 +96,7 @@ void keyboard(unsigned char key, int, int) {
 	    break;
     }
     glutPostRedisplay();
-    // printf("side of the screen rectangle is %.30f\n", screen_range);
-    // putchar('\n');
+    // printf("side of the screen rectangle is %.30f\n\n", screen_range);
 }
 
 void draw() {
@@ -92,12 +105,12 @@ void draw() {
 }
 
 void aberth() {
-    double complex w[3];
+    long double complex w[degree];
     for (uint16_t i = 0; i < 1024; i++) {
-        for (uint8_t j = 0; j < 3; j++) {
-            const double complex slp = ratio_z_dz(true_roots[j]);
-            double complex sum = 0;
-            for (uint8_t k = 0; k < 3; k++) {
+        for (uint8_t j = 0; j < degree; j++) {
+            const long double complex slp = ratio_z_dz(true_roots[j]);
+            long double complex sum = 0;
+            for (uint8_t k = 0; k < degree; k++) {
                 if (j != k) {
                     sum += 1/(true_roots[j]-true_roots[k]);
                 }
@@ -107,11 +120,11 @@ void aberth() {
         }
     }
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < degree; i++) {
         if (cimag(true_roots[i]) < 0) {
-            printf("root #%d found: %.25f %.25fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
+            printf("root #%d found: %.20f %.20fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
         } else {
-            printf("root #%d found: %.25f + %.25fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
+            printf("root #%d found: %.20f + %.20fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
         }
         switch (i)
         {
@@ -119,10 +132,23 @@ void aberth() {
             puts("(red)");
             break;
         case 1:
-            puts("(green)");
+            puts("(orange)");
             break;
         case 2:
+            puts("(yellow)");
+            break;
+        case 3:
+            puts("(green)");
+            break;
+        case 4:
             puts("(blue)");
+            break;
+        case 5:
+            puts("(indigo)");
+            break;
+        case 6:
+            puts("(violet)");
+            break;
         default:
             break;
         }
@@ -130,9 +156,13 @@ void aberth() {
 }
 
 int main(int argc, char *argv[]) {
-    for (uint8_t i = 0; i < 4; i++) {
-        double real, imag;
-        int its = sscanf(argv[i+1], "%lf+%lfi", &real, &imag);
+    degree = argc-2;
+    if (degree > 7) {
+        return -1;
+    }
+    for (uint8_t i = 0; i <= degree; i++) {
+        long double real, imag;
+        int its = sscanf(argv[i+1], "%Lf+%Lfi", &real, &imag);
         if (its == 2) {
             coeffs[i] = CMPLX(real,imag);
             printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
@@ -140,14 +170,14 @@ int main(int argc, char *argv[]) {
         }
         real = 0.0;
         imag = 0.0;
-        its = sscanf(argv[i+1], "%lf%lfi\n", &real, &imag);
+        its = sscanf(argv[i+1], "%Lf%Lfi\n", &real, &imag);
         if (its == 2) {
             coeffs[i] = CMPLX(real,imag);
             printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
             continue;
         }
         real = 0.0;
-        sscanf(argv[i+1], "%lf", &real);
+        sscanf(argv[i+1], "%Lf", &real);
         coeffs[i] = real;
         printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
     }
