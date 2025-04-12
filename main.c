@@ -14,19 +14,18 @@ struct rgb {
 struct rgb pixels[BUFFER_LINE * BUFFER_LINE];
 
 uint8_t degree;
-long double complex coeffs[8];
-long double complex true_roots[7] = {
-    -1-I, -1+I, 1+I, 1-I, I, -I, 2+I
+long double complex coeffs[7];
+long double complex true_roots[6] = {
+    -1-I, -1+I, 1+I, 1-I, I, -I
 };
 
-const struct rgb colors[7] = {
-    {1, 0, 0},
-    {1, 127.5/255, 0},
-    {1, 1, 0},
-    {0, 1, 0},
+const struct rgb colors[6] = {
     {0, 0, 1},
-    {75/255.0, 0, 130/255.0},
-    {148/255.0, 0, 211/255.0}
+    {0, 1, 0},
+    {0, 1, 1},
+    {1, 0, 0},
+    {1, 0, 1},
+    {1, 1, 0}
 };
 
 long double screen_range = 32.0;
@@ -43,7 +42,7 @@ long double complex ratio_z_dz(long double complex z) {
 }
 
 long double complex newton(long double complex zn) {
-    for (uint16_t i = 0; i < 256; i++) {
+    for (uint8_t i = 0; i < UINT8_MAX; i++) {
         zn = zn - ratio_z_dz(zn);
     }
     return zn;
@@ -123,42 +122,16 @@ void aberth() {
 
     for (int i = 0; i < degree; i++) {
         if (cimag(true_roots[i]) < 0) {
-            printf("root #%d found: %.20f %.20fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
+            printf("root #%d found: %.20f %.20fi\n", i, creal(true_roots[i]), cimag(true_roots[i]));
         } else {
-            printf("root #%d found: %.20f + %.20fi ", i, creal(true_roots[i]), cimag(true_roots[i]));
-        }
-        switch (i)
-        {
-        case 0:
-            puts("(red)");
-            break;
-        case 1:
-            puts("(orange)");
-            break;
-        case 2:
-            puts("(yellow)");
-            break;
-        case 3:
-            puts("(green)");
-            break;
-        case 4:
-            puts("(blue)");
-            break;
-        case 5:
-            puts("(indigo)");
-            break;
-        case 6:
-            puts("(violet)");
-            break;
-        default:
-            break;
+            printf("root #%d found: %.20f + %.20fi\n", i, creal(true_roots[i]), cimag(true_roots[i]));
         }
     }
 }
 
 int main(int argc, char *argv[]) {
     degree = argc-2;
-    if (degree > 7) {
+    if (degree > 6) {
         return -1;
     }
     for (uint8_t i = 0; i <= degree; i++) {
