@@ -64,6 +64,7 @@ void drawGraph() {
             for (uint8_t k = 0; k < degree; k++) {
                 if (cabs(true_roots[k] - n_res) < 0.05) {
                     rgb = colors[k];
+                    break;
                 }
             }
 
