@@ -131,31 +131,37 @@ void aberth() {
 
 int main(int argc, char *argv[]) {
     degree = argc-2;
-    if (degree > 6) {
-        return -1;
+    if (argc == 1) {
+	coeffs[0] = 1;
+	coeffs[1] = 0;
+	coeffs[2] = -2;
+	coeffs[3] = 2;
+	degree = 3;
+    } else if (degree > 6) {
+	return -1;
+    } else {
+    	for (uint8_t i = 0; i <= degree; i++) {
+    	    long double real, imag;
+    	    int its = sscanf(argv[i+1], "%Lf+%Lfi", &real, &imag);
+    	    if (its == 2) {
+    	        coeffs[i] = CMPLX(real,imag);
+    	        printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
+    	        continue;
+    	    }
+    	    real = 0.0;
+    	    imag = 0.0;
+    	    its = sscanf(argv[i+1], "%Lf%Lfi\n", &real, &imag);
+    	    if (its == 2) {
+    	        coeffs[i] = CMPLX(real,imag);
+    	        printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
+    	        continue;
+    	    }
+    	    real = 0.0;
+    	    sscanf(argv[i+1], "%Lf", &real);
+    	    coeffs[i] = real;
+    	    printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
+    	}
     }
-    for (uint8_t i = 0; i <= degree; i++) {
-        long double real, imag;
-        int its = sscanf(argv[i+1], "%Lf+%Lfi", &real, &imag);
-        if (its == 2) {
-            coeffs[i] = CMPLX(real,imag);
-            printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
-            continue;
-        }
-        real = 0.0;
-        imag = 0.0;
-        its = sscanf(argv[i+1], "%Lf%Lfi\n", &real, &imag);
-        if (its == 2) {
-            coeffs[i] = CMPLX(real,imag);
-            printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
-            continue;
-        }
-        real = 0.0;
-        sscanf(argv[i+1], "%Lf", &real);
-        coeffs[i] = real;
-        printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
-    }
-
     aberth();
 
     glutInit(&argc, argv);
