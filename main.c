@@ -172,6 +172,6 @@ int main(int argc, char *argv[]) {
 
     glutDisplayFunc(draw);
     glutKeyboardFunc(keyboard);
-    
+
     glutMainLoop();
 }
