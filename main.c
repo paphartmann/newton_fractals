@@ -74,6 +74,7 @@ void drawGraph() {
     // clock_gettime(CLOCK_REALTIME, &end);
     // printf("%ld ms to calculate the newton methods\n", ((end.tv_sec - begin.tv_sec)*1000) + (end.tv_nsec - begin.tv_nsec) / 1000000);
 
+    glClear(GL_COLOR_BUFFER_BIT);
     glDrawPixels(BUFFER_LINE, BUFFER_LINE, GL_RGB, GL_FLOAT, pixels);
 }
 
