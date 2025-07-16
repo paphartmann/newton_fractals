@@ -14,8 +14,8 @@ struct rgb {
 struct rgb pixels[BUFFER_LINE * BUFFER_LINE];
 
 uint8_t degree;
-long double complex coeffs[7];
-long double complex true_roots[6] = {
+double complex coeffs[7];
+double complex true_roots[6] = {
     -1-I, -1+I, 1+I, 1-I, I, -I
 };
 
@@ -28,12 +28,12 @@ const struct rgb colors[6] = {
     {1, 1, 0}
 };
 
-long double screen_range = 32.0;
-long double pos_x = 0.0;
-long double pos_y = 0.0;
+double screen_range = 32.0;
+double pos_x = 0.0;
+double pos_y = 0.0;
 
-long double complex ratio_z_dz(long double complex z) {
-    long double complex p = 0.0, q = 0.0;
+double complex ratio_z_dz(double complex z) {
+    double complex p = 0.0, q = 0.0;
     for (int i = 0; i <= degree; i++) {
         q = z * q + p;
         p = z * p + coeffs[i];
@@ -41,7 +41,7 @@ long double complex ratio_z_dz(long double complex z) {
     return p/q;
 }
 
-long double complex newton(long double complex zn) {
+double complex newton(double complex zn) {
     for (uint8_t i = 0; i < UINT8_MAX; i++) {
         zn = zn - ratio_z_dz(zn);
     }
@@ -51,13 +51,13 @@ long double complex newton(long double complex zn) {
 void drawGraph() {
     // struct timespec begin;
     // clock_gettime(CLOCK_REALTIME, &begin);
-    const long double step_size = screen_range/BUFFER_LINE;
+    const double step_size = screen_range/BUFFER_LINE;
     #pragma omp parallel for
     for (int i = 0; i < BUFFER_LINE; i++) {
         for (int j = 0; j < BUFFER_LINE; j++) {
-            long double x = (j*step_size) - (screen_range/2) + pos_x;
-            long double y = (i*step_size) - (screen_range/2) + pos_y;
-            long double complex n_res = newton(CMPLX(x, y));
+            double x = (j*step_size) - (screen_range/2) + pos_x;
+            double y = (i*step_size) - (screen_range/2) + pos_y;
+            double complex n_res = newton(CMPLX(x, y));
             struct rgb rgb;
 
             for (uint8_t k = 0; k < degree; k++) {
@@ -105,11 +105,11 @@ void draw() {
 }
 
 void aberth() {
-    long double complex w[degree];
+    double complex w[degree];
     for (uint16_t i = 0; i < 1024; i++) {
         for (uint8_t j = 0; j < degree; j++) {
-            const long double complex slp = ratio_z_dz(true_roots[j]);
-            long double complex sum = 0;
+            const double complex slp = ratio_z_dz(true_roots[j]);
+            double complex sum = 0;
             for (uint8_t k = 0; k < degree; k++) {
                 if (j != k) {
                     sum += 1/(true_roots[j]-true_roots[k]);
@@ -141,8 +141,8 @@ int main(int argc, char *argv[]) {
 	return -1;
     } else {
     	for (uint8_t i = 0; i <= degree; i++) {
-    	    long double real, imag;
-    	    int its = sscanf(argv[i+1], "%Lf+%Lfi", &real, &imag);
+    	    double real, imag;
+    	    int its = sscanf(argv[i+1], "%lf+%lfi", &real, &imag);
     	    if (its == 2) {
     	        coeffs[i] = CMPLX(real,imag);
     	        printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
@@ -150,14 +150,14 @@ int main(int argc, char *argv[]) {
     	    }
     	    real = 0.0;
     	    imag = 0.0;
-    	    its = sscanf(argv[i+1], "%Lf%Lfi\n", &real, &imag);
+    	    its = sscanf(argv[i+1], "%lf%lfi\n", &real, &imag);
     	    if (its == 2) {
     	        coeffs[i] = CMPLX(real,imag);
     	        printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
     	        continue;
     	    }
     	    real = 0.0;
-    	    sscanf(argv[i+1], "%Lf", &real);
+    	    sscanf(argv[i+1], "%lf", &real);
     	    coeffs[i] = real;
     	    printf("%f + %fi\n", creal(coeffs[i]), cimag(coeffs[i]));
     	}
