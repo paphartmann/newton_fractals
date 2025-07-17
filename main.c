@@ -1,9 +1,9 @@
 #include <GL/glut.h>
 #include <complex.h>
-#include <math.h>
+//#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+//#include <stdlib.h>
+//#include <time.h>
 
 #define BUFFER_LINE 800
 
